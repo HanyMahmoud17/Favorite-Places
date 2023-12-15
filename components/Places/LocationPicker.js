@@ -1,5 +1,5 @@
 import { Alert, Image, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import OutlineButton from "../UI/OutlineButton";
 import { Colors } from "../../constants/colors";
 import {
@@ -8,11 +8,33 @@ import {
   useForegroundPermissions,
 } from "expo-location";
 import { getMapPreview } from "../../util/location";
-import { useNavigation } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  useIsFocused,
+} from "@react-navigation/native";
 
 const LocationPicker = () => {
   const [pickedLocation, setPickedLocation] = useState();
-  const navigation=useNavigation();
+  const navigation = useNavigation();
+  // this to render the screen of AddPlace again
+  const isFocused = useIsFocused(); // this is return boolean
+
+  // get data from params
+  const route = useRoute();
+  // console.log(route.params);
+
+  // set data using useEffect to render the location if there is picked location
+  useEffect(() => {
+    if (isFocused && route.params) {
+      const mapPickedLocation = {
+        lat: route.params.selectLat,
+        lng: route.params.selectlng,
+      };
+      setPickedLocation(mapPickedLocation);
+    }
+  }, [route, isFocused]);
+  // console.log(pickedLocation);
   // permission for get location
   const [locationPermissionInformation, requestPermission] =
     useForegroundPermissions();
@@ -51,25 +73,23 @@ const LocationPicker = () => {
   }
 
   function pickOnMapHandler() {
-    navigation.navigate('Map')
+    navigation.navigate("Map");
   }
 
   let LocationPreview = <Text>No Location Picked</Text>;
   if (pickedLocation) {
     LocationPreview = (
       <Image
-      style={styles.image}
+        style={styles.image}
         source={{
           uri: getMapPreview(pickedLocation.lat, pickedLocation.lng),
         }}
       />
-    );
+    ); 
   }
   return (
     <View>
-      <View style={styles.mapStyle}>
-        {LocationPreview}
-      </View>
+      <View style={styles.mapStyle}>{LocationPreview}</View>
       <View style={styles.actions}>
         <OutlineButton icon="location" onPress={getLocationHandler}>
           Locate User
@@ -92,14 +112,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 4,
     backgroundColor: Colors.primary100,
+    marginTop:4
   },
   actions: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
   },
-  image:{
+  image: {
     width: "100%",
     height: "100%",
-  }
+  },
 });
