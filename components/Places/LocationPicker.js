@@ -7,7 +7,7 @@ import {
   getCurrentPositionAsync,
   useForegroundPermissions,
 } from "expo-location";
-import { getMapPreview } from "../../util/location";
+import { getAddress, getMapPreview } from "../../util/location";
 import {
   useNavigation,
   useRoute,
@@ -25,9 +25,19 @@ const LocationPicker = ({ onPickedLocation }) => {
   // console.log(route.params);
 
   // i use this to update the onPickedLocation to a new change in the locartion
-  useEffect(()=>{
-    onPickedLocation(pickedLocation)
-  },[pickedLocation,onPickedLocation])
+  useEffect(() => {
+    async function handleLocation() {
+      if (pickedLocation) {
+        const address = await getAddress(
+          pickedLocation.lat,
+          pickedLocation.lng
+        );
+        onPickedLocation({ ...pickedLocation, address: address });
+      }
+    }
+    // access function
+    handleLocation();
+  }, [pickedLocation, onPickedLocation]);
   // set data using useEffect to render the location if there is picked location
   useEffect(() => {
     if (isFocused && route.params) {
