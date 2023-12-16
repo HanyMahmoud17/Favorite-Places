@@ -1,9 +1,9 @@
-class Place{
-    constructor(title,imagUri,location,address){
+export class Place{
+    constructor(title,imagUri,location){
         this.title = title;
         this.imagUri = imagUri;
-        this.location = location
-        this.address = address;
+        this.address = location.address;
+        this.location = {lat:location.lat,lng:location.lng}
         this.id= new Date().toString() + Math.random().toString()
     }
 }
