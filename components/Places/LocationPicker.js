@@ -14,7 +14,7 @@ import {
   useIsFocused,
 } from "@react-navigation/native";
 
-const LocationPicker = () => {
+const LocationPicker = ({ onPickedLocation }) => {
   const [pickedLocation, setPickedLocation] = useState();
   const navigation = useNavigation();
   // this to render the screen of AddPlace again
@@ -24,6 +24,10 @@ const LocationPicker = () => {
   const route = useRoute();
   // console.log(route.params);
 
+  // i use this to update the onPickedLocation to a new change in the locartion
+  useEffect(()=>{
+    onPickedLocation(pickedLocation)
+  },[pickedLocation,onPickedLocation])
   // set data using useEffect to render the location if there is picked location
   useEffect(() => {
     if (isFocused && route.params) {
@@ -85,7 +89,7 @@ const LocationPicker = () => {
           uri: getMapPreview(pickedLocation.lat, pickedLocation.lng),
         }}
       />
-    ); 
+    );
   }
   return (
     <View>
@@ -112,7 +116,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 4,
     backgroundColor: Colors.primary100,
-    marginTop:4
+    marginTop: 4,
   },
   actions: {
     flexDirection: "row",
